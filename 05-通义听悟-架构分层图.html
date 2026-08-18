@@ -1,0 +1,39 @@
+<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>通义听悟·架构分层图</title><link rel="stylesheet" href="style.css"><style>.arch{display:grid;gap:12px}.tier{padding:18px;border:1px solid var(--line);border-radius:14px;background:var(--panel)}.tier h3{margin:0 0 10px}.chips{display:flex;gap:8px;flex-wrap:wrap}.arrow{text-align:center;color:var(--cyan);font-size:26px}.split{display:grid;grid-template-columns:1fr 1fr;gap:12px}.legend2{display:flex;gap:14px;flex-wrap:wrap}@media(max-width:760px){.split{grid-template-columns:1fr}}</style></head><body><main class="wrap">
+<nav class="nav"><a href="01-通义听悟-用户旅程-页面取证版.html">01 用户旅程</a><a href="02-通义听悟-Agent契约-页面证据版.html">02 Agent 契约</a><a href="03-通义听悟-智能纪要Agent-功能等价SystemPrompt.html">03 System Prompt</a><a href="04-通义听悟-产品全景架构-证据分层版.html">04 全景架构</a><a class="current" href="05-通义听悟-架构分层图.html">05 分层图</a></nav>
+<header class="hero"><div class="kicker">Architecture map</div><h1>通义听悟架构分层图</h1><p class="subtitle">一张图看清“输入—理解—资产—分发”的端到端依赖。绿色标签是官方页面可直接确认，黄色是为连接这些能力所做的工程推断。</p></header>
+<p class="legend2"><span class="tag confirmed">已确认</span><span class="tag infer">合理推断</span><span class="tag design">建议设计</span><span class="tag unknown">未知</span></p>
+
+<section class="arch">
+<div class="tier"><h3>1 · 产品接入层 <span class="tag confirmed">已确认</span></h3><div class="chips"><span class="node">Web 工作台</span><span class="node">实时麦克风</span><span class="node">本地音视频</span><span class="node">阿里云盘</span><span class="node">RSS 播客</span><span class="node">浏览器插件</span><span class="node">企业 API</span></div></div>
+<div class="arrow">↓</div>
+<div class="tier"><h3>2 · 入口网关与任务层 <span class="tag infer">合理推断</span></h3><div class="chips"><span class="node">身份/租户</span><span class="node">配额校验</span><span class="node">格式/时长/采样率</span><span class="node">任务幂等键</span><span class="node">实时 Session</span><span class="node">离线 Job</span><span class="node">回调/状态查询</span></div></div>
+<div class="arrow">↓</div>
+<div class="split"><div class="tier"><h3>3A · 语音语言管线</h3><div class="chips"><span class="node">解码/标准化</span><span class="node">ASR</span><span class="node">断句/标点</span><span class="node">时间戳</span><span class="node">发言人分离</span><span class="node">声音事件</span><span class="node">翻译</span></div></div><div class="tier"><h3>3B · 视觉管线</h3><div class="chips"><span class="node">视频抽帧</span><span class="node">页面变化检测</span><span class="node">PPT/OCR</span><span class="node">图像去重</span><span class="node">讲解时间对齐</span></div></div></div>
+<div class="arrow">↓</div>
+<div class="tier"><h3>4 · 内容智能层 <span class="tag confirmed">能力已确认</span></h3><div class="chips"><span class="node">全文概要</span><span class="node">章节速览</span><span class="node">发言总结</span><span class="node">问答/要点</span><span class="node">待办</span><span class="node">关键词</span><span class="node">重点句</span><span class="node">场景识别</span><span class="node">PPT 讲解总结</span><span class="node">AI 改写</span></div><p class="small">具体模型、Prompt 和调用次序未公开。</p></div>
+<div class="arrow">↓</div>
+<div class="tier"><h3>5 · 统一内容图谱 <span class="tag design">建议设计</span></h3><div class="chips"><span class="node">Record</span><span class="node">Media</span><span class="node">Utterance</span><span class="node">Speaker</span><span class="node">Translation</span><span class="node">Chapter</span><span class="node">Insight</span><span class="node">PPTPage</span><span class="node">Note</span><span class="node">EvidenceRef</span></div><p class="small">以 <code>Record + time range</code> 为主轴，让所有派生内容都能回到原始声音/画面。</p></div>
+<div class="arrow">↓</div>
+<div class="split"><div class="tier"><h3>6A · 工作台交互</h3><div class="chips"><span class="node">搜索</span><span class="node">时间回跳</span><span class="node">原文编辑</span><span class="node">发言人编辑</span><span class="node">笔记摘取</span><span class="node">双语对照</span></div></div><div class="tier"><h3>6B · 资产管理</h3><div class="chips"><span class="node">文件夹</span><span class="node">收藏</span><span class="node">移动/重命名</span><span class="node">筛选/批量</span><span class="node">7 天回收站</span></div></div></div>
+<div class="arrow">↓</div>
+<div class="tier"><h3>7 · 交付与生态层 <span class="tag confirmed">已确认</span></h3><div class="chips"><span class="node">本地文件</span><span class="node">阿里云盘</span><span class="node">公开分享链接</span><span class="node">社交平台</span><span class="node">分享海报</span><span class="node">允许创建副本</span><span class="node">企业应用/API</span></div></div>
+</section>
+
+<h2>横切基础设施</h2><div class="grid"><div class="card"><strong>数据与存储</strong>对象存储、元数据 DB、全文搜索、派生版本、缓存。 <span class="tag infer">合理推断</span></div><div class="card"><strong>安全与权限</strong>账号、分享权限、云盘授权、数据删除、用户权利。 <span class="tag confirmed">功能已确认</span></div><div class="card"><strong>运行稳定性</strong>异步任务状态、回调、重试、限流、成本核算、模型降级。 <span class="tag infer">部分推断</span></div><div class="card"><strong>质量系统</strong>ASR/发言人/翻译/总结/PPT 分层评估，无证据结论率。 <span class="tag design">建议设计</span></div></div>
+
+<h2>主数据流</h2><div class="flow">Media bytes
+ ├─→ Media metadata / waveform
+ ├─→ Utterance timeline ─→ Translation
+ │          └─→ Speaker attribution
+ └─→ Video frames ─→ PPT pages
+
+Utterance timeline + Speaker + PPT pages
+ └─→ Structured insights
+       ├─→ Chapters / Summary / QA / Actions
+       ├─→ Search index / Notes
+       └─→ Export / Share / API callback
+
+用户编辑 ─→ 新转写版本 ─→ 可控刷新译文与派生内容</div>
+
+<h2>未知区域</h2><table><tr><th>未知项</th><th>为何不确认</th><th>验证方式</th></tr><tr><td>具体模型与 Prompt</td><td>官方仅公开能力，未公开实现</td><td>官方技术文档/白皮书</td></tr><tr><td>任务队列与重试</td><td>前端只显示进度和状态</td><td>开发文档错误码、SLA</td></tr><tr><td>实时定价</td><td>帮助页无当期完整价格表</td><td>当期阿里云价格/控制台</td></tr><tr><td>存储细节</td><td>隐私政策提供法律边界，不提供技术拓扑</td><td>安全白皮书/合规附录</td></tr></table>
+<footer class="small">本图是功能等价架构，用于产品分析和方案设计，不声称与通义听悟内部服务拓扑一致。</footer></main></body></html>

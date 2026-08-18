@@ -1,0 +1,41 @@
+<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>通义听悟·Agent 契约</title><link rel="stylesheet" href="style.css"></head><body><main class="wrap">
+<nav class="nav"><a href="01-通义听悟-用户旅程-页面取证版.html">01 用户旅程</a><a class="current" href="02-通义听悟-Agent契约-页面证据版.html">02 Agent 契约</a><a href="03-通义听悟-智能纪要Agent-功能等价SystemPrompt.html">03 System Prompt</a><a href="04-通义听悟-产品全景架构-证据分层版.html">04 全景架构</a><a href="05-通义听悟-架构分层图.html">05 分层图</a></nav>
+<header class="hero"><div class="kicker">Agent contracts</div><h1>通义听悟的 Agent 组织方式</h1><p class="subtitle">官方页面没有声称其内部使用多 Agent。本文把可见功能重构为一组“功能等价 Agent 契约”：已确认的是能力和输入输出，Agent 分工为合理推断/建议设计。</p></header>
+<div class="callout warn"><span class="tag infer">合理推断</span> “Agent”是用于逆向建模的责任单元，不等于官方公开的后台服务名。</div>
+
+<h2>1·契约总览</h2><table><tr><th>Agent</th><th>责任</th><th>核心输入</th><th>核心输出</th><th>终止条件</th></tr><tr><td>A0 任务编排</td><td>根据来源/语言/场景路由能力</td><td>job spec</td><td>执行 DAG、状态</td><td>全部必选阶段成功或明确失败</td></tr><tr><td>A1 媒体接入</td><td>校验、解码、标准化</td><td>实时流/文件/RSS</td><td>标准音频、媒体元数据</td><td>产生可转写音轨</td></tr><tr><td>A2 语音转写</td><td>ASR、断句、时间戳、声音事件</td><td>音频流、语言、专有词</td><td>utterance[]</td><td>文本覆盖可用音轨</td></tr><tr><td>A3 发言人分离</td><td>聚类与发言归属</td><td>音频、utterance、人数先验</td><td>speaker_id 标注</td><td>所有发言有归属或 unknown</td></tr><tr><td>A4 翻译</td><td>句段级双语对齐</td><td>utterance[]、目标语言</td><td>translation[]</td><td>全部可支持句段已译</td></tr><tr><td>A5 结构化理解</td><td>章节、概要、关键词、发言总结</td><td>带时间与说话人的文本</td><td>summary package</td><td>所有结论可对齐证据片段</td></tr><tr><td>A6 会议洞察</td><td>问答、要点、待办、关键句、场景</td><td>结构化文本</td><td>insight package</td><td>无新的可信任洞察</td></tr><tr><td>A7 视觉/PPT</td><td>检测演示页并对齐讲解</td><td>视频帧+转写</td><td>PPT 图片、摘要、时间点</td><td>视频时间线遍历完成</td></tr><tr><td>A8 书面化</td><td>保留要点的精简与润色</td><td>用户选定的原文</td><td>rewritten text</td><td>信息覆盖与风格校验通过</td></tr><tr><td>A9 证据回链</td><td>让摘要、章节、PPT 可回到原片段</td><td>所有派生结果</td><td>evidence_refs</td><td>关键声明无孤立结论</td></tr><tr><td>A10 资产与分发</td><td>导出、分享、云盘、归档</td><td>用户选择+权限</td><td>文件/链接/资产状态</td><td>交付可达且权限正确</td></tr></table>
+
+<h2>2·核心数据契约</h2><pre><code>JobSpec {
+  source: realtime | local_file | aliyundrive | rss,
+  media_uri, language_mode, translation_target?,
+  speaker_mode: single | two | multi,
+  custom_vocabulary[], requested_capabilities[]
+}
+
+Utterance {
+  id, start_ms, end_ms, text, language,
+  speaker_id?, event_type?, confidence?, edited_by_user?
+}
+
+InsightPackage {
+  keywords[], full_summary,
+  chapters[{title, summary, evidence_refs[]}],
+  speaker_summaries[{speaker_id, summary, evidence_refs[]}],
+  qa_or_keypoints[], action_items[],
+  ppt_pages[]?, warnings[]
+}
+
+EvidenceRef { utterance_ids[], start_ms, end_ms, media_id }</code></pre>
+<div class="callout"><span class="tag design">建议设计</span> 官方页面已确认“章节/PPT 可回顾原片段”；将 <code>evidence_refs</code> 提升为所有派生结果的必填字段，是对这一产品特征的功能等价实现。</div>
+
+<h2>3·详细 Agent 契约</h2>
+<h3>A0 · 任务编排 Agent</h3><table><tr><th>契约项</th><th>内容</th></tr><tr><td>目标</td><td>将 JobSpec 转成有依赖的执行图，控制实时和离线两种时序。</td></tr><tr><td>先决条件</td><td>媒体可读；语言/格式/采样率/时长/配额校验通过。</td></tr><tr><td>不变式</td><td>用户未请求的付费/分享/删除操作不自动执行；每个阶段可观测、可重试。</td></tr><tr><td>失败</td><td>保留已完成的中间结果，区分“转写失败”与“总结失败”。</td></tr></table>
+<h3>A2 · 语音转写 Agent</h3><table><tr><th>契约项</th><th>内容</th></tr><tr><td>输入</td><td>PCM/标准化音轨、语言模式、专有词、实时/离线模式。</td></tr><tr><td>输出</td><td>带起止时间的 utterance 序列，可附加声音事件。</td></tr><tr><td>质量要求</td><td>断句稳定；专有词命中；不确定片段保留低置信标记，不用常识补齐。</td></tr><tr><td>编辑传播</td><td>用户编辑后产生新版本，触发译文及相关摘要的可控刷新。</td></tr></table>
+<h3>A5/A6 · 结构化理解与会议洞察</h3><table><tr><th>约束</th><th>要求</th></tr><tr><td>事实性</td><td>只用转写中的信息；不将推测写成已决定事实。</td></tr><tr><td>待办</td><td>尽量抽取责任人、动作、截止时间、依赖；缺失时标记“未明确”。</td></tr><tr><td>问答</td><td>区分显性提问与隐性问题；回答不得超出对话。</td></tr><tr><td>证据</td><td>每个章节、关键结论、待办、问答附时间范围和 utterance id。</td></tr><tr><td>场景</td><td>会议/访谈/课程/演讲仅用于选择输出结构，不更改原事实。</td></tr></table>
+<h3>A7 · PPT 理解 Agent</h3><ul><li>只在视频来源且检测到演示页时运行。</li><li>对相邻帧去重，保留清晰主帧，关联页面起止时间。</li><li>总结的是“这一页与其讲解”，不只是 OCR 文字。</li><li>未看清的小字标记不确定，不献测。</li></ul>
+<h3>A10 · 资产与分发 Agent</h3><ul><li>导出是明确的用户触发动作，选择内容、格式、目标位置。</li><li>公开分享前显示权限，“允许创建副本”是独立开关。</li><li>阿里云盘导出与本地下载是两个独立交付器，失败可分别重试。</li></ul>
+
+<h2>4·跨 Agent 不变式</h2><div class="grid"><div class="card"><strong>时间线为主键</strong>文字、章节、PPT、待办、笔记都能回到时间段。</div><div class="card"><strong>人工更正优先</strong>用户编辑后的原文和发言人名不被后台自动结果覆盖。</div><div class="card"><strong>派生内容可再生</strong>原文变更后，译文和摘要能按版本重算。</div><div class="card"><strong>无证据不确认</strong>不可验证的责任人、日期、数字统一标注为未明确。</div></div>
+
+<h2>5·可观测与验收</h2><table><tr><th>层</th><th>核心指标</th><th>验收方法</th></tr><tr><td>接入</td><td>媒体成功率、首字延迟、队列时间</td><td>合成格式/采样率/超限用例</td></tr><tr><td>转写</td><td>WER/CER、专有词命中、时间戳偏差</td><td>多语言、噪声、多人金标集</td></tr><tr><td>发言人</td><td>DER、名称覆盖保护</td><td>2 人/多人、重叠说话</td></tr><tr><td>总结</td><td>覆盖率、忠实度、证据回链率</td><td>每条结论回放核验</td></tr><tr><td>待办</td><td>责任人/日期幻觉率</td><td>构造含缺失字段的会议</td></tr><tr><td>分发</td><td>链接可达、权限正确、文件完整</td><td>公开/取消、副本开关、不同格式</td></tr></table>
+<footer class="small">证据基础：E-A-001—004、E-R-001—002。Agent 边界为功能等价设计，非官方后台声明。</footer></main></body></html>

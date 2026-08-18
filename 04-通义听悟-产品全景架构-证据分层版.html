@@ -1,0 +1,40 @@
+<!doctype html><html lang="zh-Hans"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>通义听悟·产品全景架构</title><link rel="stylesheet" href="style.css"></head><body><main class="wrap">
+<nav class="nav"><a href="01-通义听悟-用户旅程-页面取证版.html">01 用户旅程</a><a href="02-通义听悟-Agent契约-页面证据版.html">02 Agent 契约</a><a href="03-通义听悟-智能纪要Agent-功能等价SystemPrompt.html">03 System Prompt</a><a class="current" href="04-通义听悟-产品全景架构-证据分层版.html">04 全景架构</a><a href="05-通义听悟-架构分层图.html">05 分层图</a></nav>
+<header class="hero"><div class="kicker">Product panorama</div><h1>通义听悟产品全景架构</h1><p class="subtitle">从消费端入口、媒体处理、多模态 AI、内容资产、分发协作到开发者 API，用证据等级区分“官方可见”与“工程推断”。</p></header>
+
+<h2>1·结论摘要</h2><div class="grid"><div class="card"><strong>1. 产品本质</strong>不是“语音转文字工具”，而是以时间线为索引的音视频知识工作台。</div><div class="card"><strong>2. 产品飞轮</strong>更多输入→更多结构化资产→更强检索/回顾→更高粘性→更多输入。</div><div class="card"><strong>3. 竞争力组合</strong>ASR、翻译、说话人、LLM 纪要、PPT 视觉、时间回链和协作交付组合在一条链路。</div><div class="card"><strong>4. 平台化</strong>消费 Web 端是前台验证场，API 将同类能力参数化输出给企业。</div></div>
+
+<h2>2·分层架构</h2>
+<div class="lane"><div class="who">L1 渠道与场景</div><div class="what"><span class="node">Web 工作台</span><span class="node">手机访问</span><span class="node">浏览器插件</span><span class="node">阿里云盘</span><span class="node">企业 API</span><p class="small">办公、学习、访谈、培训、媒资库、金融与媒体交流均有官方场景说明。</p></div></div>
+<div class="lane"><div class="who">L2 用户任务</div><div class="what"><span class="node">实时记录</span><span class="node">上传音视频</span><span class="node">云盘转写</span><span class="node">RSS 播客</span><span class="node">搜索回顾</span><span class="node">分享导出</span></div></div>
+<div class="lane"><div class="who">L3 任务编排</div><div class="what"><span class="node">格式/时长/配额校验</span><span class="node">语言路由</span><span class="node">实时/离线调度</span><span class="node">状态查询</span><span class="node">回调通知</span><p class="small"><span class="tag infer">合理推断</span> 官方 API 确认了主动通知、状态查询和参数化能力组合；内部编排器名称未公开。</p></div></div>
+<div class="lane"><div class="who">L4 媒体 AI</div><div class="what"><span class="node">音视频解码</span><span class="node">ASR</span><span class="node">断句/时间戳</span><span class="node">说话人分离</span><span class="node">声音事件</span><span class="node">文本翻译</span><span class="node">PPT 抽帧/OCR</span></div></div>
+<div class="lane"><div class="who">L5 内容智能</div><div class="what"><span class="node">章节分割</span><span class="node">全文摘要</span><span class="node">发言总结</span><span class="node">问答摘要</span><span class="node">关键词</span><span class="node">待办</span><span class="node">重点句</span><span class="node">场景识别</span><span class="node">口语书面化</span></div></div>
+<div class="lane"><div class="who">L6 内容模型</div><div class="what"><span class="node">Media Asset</span><span class="node">Transcript</span><span class="node">Speaker</span><span class="node">Translation</span><span class="node">Chapter</span><span class="node">Insight</span><span class="node">Note</span><span class="node">PPT Page</span><span class="node">Evidence Ref</span></div></div>
+<div class="lane"><div class="who">L7 资产与协作</div><div class="what"><span class="node">我的记录</span><span class="node">文件夹</span><span class="node">收藏</span><span class="node">搜索/筛选</span><span class="node">回收站</span><span class="node">公开分享</span><span class="node">副本</span><span class="node">本地/云盘导出</span></div></div>
+<div class="lane"><div class="who">L8 安全与运营</div><div class="what"><span class="node">身份/权限</span><span class="node">分享授权</span><span class="node">配额/权益</span><span class="node">数据留存</span><span class="node">删除/恢复</span><span class="node">日志/监控</span><span class="node">隐私请求</span></div></div>
+
+<h2>3·核心领域模型</h2><table><tr><th>实体</th><th>关键字段</th><th>关系</th><th>证据属性</th></tr><tr><td>Record</td><td>id, source, title, language, duration, status</td><td>1:N Transcript/Chapter/Note</td><td><span class="tag confirmed">已确认</span> 记录、状态、来源筛选可见</td></tr><tr><td>Utterance</td><td>start/end, text, speaker, translation</td><td>N:1 Record</td><td><span class="tag infer">合理推断</span> 由时间回跳与发言编辑必然性推导</td></tr><tr><td>Speaker</td><td>speaker_id, display_name, favorite</td><td>1:N Utterance</td><td><span class="tag confirmed">已确认</span> 编辑、常用、筛选功能</td></tr><tr><td>Chapter</td><td>title, summary, start/end</td><td>N:1 Record</td><td><span class="tag confirmed">已确认</span> 章节速览与时间线</td></tr><tr><td>Insight</td><td>type, text, evidence refs</td><td>N:1 Record</td><td><span class="tag design">建议设计</span> 统一模型承载概要/问答/待办</td></tr><tr><td>PPTPage</td><td>image, summary, start/end</td><td>N:1 Record</td><td><span class="tag confirmed">已确认</span> 逐页总结与片段回跳</td></tr><tr><td>Share</td><td>identifier, public, allow_copy</td><td>N:1 Record</td><td><span class="tag confirmed">已确认</span> 公开分享/创建副本</td></tr></table>
+
+<h2>4·能力地图：官方确认 vs 工程推断</h2><table><tr><th>领域</th><th><span class="tag confirmed">已确认</span></th><th><span class="tag infer">合理推断</span></th><th><span class="tag unknown">未知</span></th></tr><tr><td>语音</td><td>5 种识别模式，实时/离线，说话人分离</td><td>分块流式 ASR、转写版本管理</td><td>具体模型、置信阈值</td></tr><tr><td>语言</td><td>中英/中日翻译，原文编辑后译文更新</td><td>句段对齐与增量刷新</td><td>翻译模型与缓存策略</td></tr><tr><td>LLM</td><td>概要、章节、发言、问答、待办、关键词、改写</td><td>多步骤结构化抽取+质量校验</td><td>模型品牌、Prompt、温度</td></tr><tr><td>视觉</td><td>PPT 抽取、总结、时间对齐、导出</td><td>帧变化检测+OCR+语音对齐</td><td>视觉模型、去重阈值</td></tr><tr><td>存储</td><td>文件夹、云盘、7 天回收站</td><td>对象存储+结构化 DB+搜索索引</td><td>实际存储产品与备份拓扑</td></tr><tr><td>调度</td><td>API 回调、状态查询、参数化开启能力</td><td>工作流编排、幂等任务、分阶段重试</td><td>队列、超时、重试次数</td></tr></table>
+
+<h2>5·产品飞轮</h2><div class="flow">多源输入（实时 / 文件 / 云盘 / RSS）
+       ↓
+转写与语义结构化
+       ↓
+时间可定位的内容资产
+       ↓
+搜索、回顾、编辑、分享、导出
+       ↓
+工作流进入日常会议/学习/访谈
+       ↓
+更多内容持续进入工作台</div>
+<p><span class="tag infer">合理推断</span> 用户价值与历史资产密度正相关：记录越多，文件夹、搜索、收藏、分享、常用发言人和专有词的价值越高。</p>
+
+<h2>6·商业与产品边界</h2><table><tr><th>层面</th><th>已知</th><th>不应越界的结论</th></tr><tr><td>消费端权益</td><td>帮助文档存在“权益加油站”与获取转写时长的运营方式</td><td>不把帮助页中的历史额度说明视为 2026 当前付费价格</td></tr><tr><td>企业 API</td><td>首页展示“全面降价、支持自定义 prompt”；帮助文档有开发指引</td><td>不在无当期定价表时报出具体单价</td></tr><tr><td>低代码/私有化</td><td>首页 Banner 展示“低代码应用模板，开箱即用可私有化部署”</td><td>不推断交付形态、售价或部署组件</td></tr></table>
+
+<h2>7·隐私与数据治理</h2><div class="grid"><div class="card"><strong>云端处理</strong>隐私政策明示实时与离线转写收集音视频内容，在云端完成转写，并收集转写文本。</div><div class="card"><strong>发言人边界</strong>政策称识别通过节奏、时间等客观特征，不存储个人声音特征信息。</div><div class="card"><strong>存储位置</strong>政策称境内运营收集产生的个人信息存于中国境内。</div><div class="card"><strong>删除与权利</strong>政策列出查阅、更正、删除、注销等权利，并表述对用户删除数据仅保存 30 天。</div></div>
+<div class="callout danger"><strong>合规注意：</strong>隐私政策页显示更新于 2023-05-31。设计真实业务时，应核对最新政策、合同、控制台配置与行业合规要求，不能只依赖本拆解。</div>
+
+<h2>8·建议的复制路线</h2><ol><li><strong>MVP：</strong>文件上传→转写→时间线→全文概要/章节→导出。</li><li><strong>会议版：</strong>增加实时转写、发言人分离、待办和分享。</li><li><strong>学习版：</strong>增加视频 PPT、翻译、笔记摘取、转写改写。</li><li><strong>平台版：</strong>抽象任务 API、状态机、回调、参数化能力、多租户配额与审计。</li></ol>
+<footer class="small">证据主索引：E-O-001—006，E-R-001—002，E-J-001—008。</footer></main></body></html>
